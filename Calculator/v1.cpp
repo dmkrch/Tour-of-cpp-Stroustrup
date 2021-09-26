@@ -2,8 +2,23 @@
 
 using namespace std;
 
-int main()
-{
+
+/*
+
+
+
+
+
+*/
+class Token {
+public:
+    char kind;
+    double value;
+};
+
+
+
+int main() {
     cout << "Enter expression: ";
     int lval = 0;
     int rval;
@@ -16,8 +31,6 @@ int main()
         res = lval + rval;
     else if (op == '-')
         res = lval - rval;
-
-    cout << "Result: " << res << '\n';
     
     return 0;
 }
