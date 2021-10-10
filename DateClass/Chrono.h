@@ -14,36 +14,35 @@ namespace Chrono
         thursday, friday, saturday, sunday
     };
 
-    class Year 
-    {
-    public:
-        class InvalidYear{};
-        Year(int x) : year{x} { if (x<min || max<=x) throw InvalidYear(); }
-        int get_year() { return year; }
-    private:
-        static const int min = 1800;
-        static const int max = 2200;
-        int year;
-    };
-
     class Date
     {
     public:
         class InvalidDate {};
-        Date(Year y, Month m, int d);
+        Date(int y, Month m, int d);
         Date();
-        void ShowDate();
+        
+        // non-modification functions
+        void ShowDate() const;
         Month get_month() const { return month; }
-        Year get_year() const { return year; }
+        int get_year() const { return year; }
         int get_day() const { return day; }
 
+        // modification functions
+        void add_day(int n);
+        void add_month(int n);
+        void add_year(int n);
+
     private:
-        Year year;
+        int year;
         Month month;
         int day;
         bool is_valid();
     };
 
     std::ostream& operator<<(std::ostream& os, Month m);
-    std::ostream& operator<<(std::ostream& os, Year y);
+    std::ostream& operator<<(std::ostream& os, const Date& d);
+
+    bool is_leapyear(int n);
+    bool operator==(const Date& a, const Date& b);
+    bool operator!=(const Date& a, const Date& b);   
 }

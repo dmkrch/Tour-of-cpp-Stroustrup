@@ -6,11 +6,15 @@ int main()
 {
     try 
     {
-        Chrono::Date my_birthday{Chrono::Year{2001}, Chrono::Month::Jul, 10};
-        my_birthday.ShowDate();
+        Chrono::Date my_birthday{2001, Chrono::Month::Jul, 10};
+        my_birthday.ShowDate(); // 2001.July.10
 
-        Chrono::Date wrong_date{Chrono::Year{2006}, Chrono::Month::Feb, 41}; // here we'll get an error
-        wrong_date.ShowDate();
+        my_birthday.add_month(13);
+        my_birthday.ShowDate(); // 2002.August.10
+
+        Chrono::Date some_day{2002, Chrono::Month::Aug, 10};
+        my_birthday==some_day ? std::cout << "equal\n" : std::cout << "not equal\n"; // equal
+        my_birthday!=some_day ? std::cout << "not equal\n" : std::cout << "equal\n"; // equal
     }
     catch(Chrono::Date::InvalidDate d)
     {
