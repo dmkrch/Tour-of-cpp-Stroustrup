@@ -11,9 +11,6 @@ namespace Library
 
 
 
-
-
-
     // class for storing ISBN code in format n-n-n-x,
     // where n - number, x - digit or symbol
     class ISBN
