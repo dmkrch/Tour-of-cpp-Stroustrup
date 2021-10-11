@@ -15,7 +15,7 @@ namespace Chrono
     Date::Date(int y, Month m, int d)
         : year{y}, month{m}, day{d}
     {
-        if (!is_valid()) throw InvalidDate(); // if date is not valid - throw exception
+        if (!IsValid()) throw InvalidDate(); // if date is not valid - throw exception
     }
 
     Date::Date()
@@ -24,7 +24,7 @@ namespace Chrono
 
     }
 
-    bool Date::is_valid()
+    bool Date::IsValid()
     {
         if ((int)month < 1 || (int)month > 12) return false;
         if (day < 1 || day > 31) return false;
@@ -36,7 +36,7 @@ namespace Chrono
         std::cout << year <<  "." << month << "." << day << "\n";
     }
 
-    bool is_leapyear(int n)
+    bool IsLeapYear(int n)
     {
         if (n % 400 == 0) // if year % 400 no remainder - this is a leap y.
             return true;
@@ -48,23 +48,23 @@ namespace Chrono
             return false;
     }
 
-    void Date::add_day(int n)
+    void Date::AddDay(int n)
     {
         // leaving realisation for future
     }
 
-    void Date::add_month(int n)
+    void Date::AddMonth(int n)
     {
         int curr_month = (int)month;
         month = (Month)((curr_month + n) % 12); // changing month to next
 
         int year_adder = (curr_month + n) / 12;
-        add_year(year_adder);
+        AddYear(year_adder);
     }
 
-    void Date::add_year(int n)
+    void Date::AddYear(int n)
     {
-        if (month==Month::Feb && day==29 && !is_leapyear(year+n))
+        if (month==Month::Feb && day==29 && !IsLeapYear(year+n))
         {
             month = Month::Mar; // 29 february turns into 1 march
             day = 1;
@@ -74,9 +74,9 @@ namespace Chrono
 
     bool operator==(const Date& a, const Date& b)
     {
-        return a.get_year() == b.get_year()
-            && a.get_month() == b.get_month()
-            && a.get_day() == b.get_day();
+        return a.GetYear() == b.GetYear()
+            && a.GetMonth() == b.GetMonth()
+            && a.GetDay() == b.GetDay();
     }
 
     bool operator!=(const Date& a, const Date& b)

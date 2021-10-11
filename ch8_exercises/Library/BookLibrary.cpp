@@ -2,41 +2,41 @@
 
 namespace Library
 {
-    bool is_digit(int a) { return (a >= '0' && a <= '9'); }
+    bool IsDigit(int a) { return (a >= '0' && a <= '9'); }
     
-    bool is_eng_symbol(int a) 
+    bool IsEngSymbol(int a) 
     { 
         return (a >= 'A' && a <= 'Z') 
             || (a >= 'a' && a <= 'z'); 
     }
 
-    bool ISBN::is_valid()
+    bool ISBN::IsValid()
     {
         if (n1 > 0 && n2 > 0 && n3 > 0
-            && (is_digit(x) || is_eng_symbol(x)))
+            && (IsDigit(x) || IsEngSymbol(x)))
             return true;
     }
     
-    Book::Book(ISBN c, std::string t, std::string n, Chrono::Date d, bool g)
-            : isbn_code{c}, title{t}, author_name{n}, registration_date{d},
-            is_given{g} {}
+    Book::Book(ISBN c, std::string t, std::string n, Chrono::Date d, bool g, Genre gr)
+            : isbnCode{c}, title{t}, authorName{n}, registrationDate{d},
+            IsGiven{g}, genre{gr} {}
 
     bool operator==(const ISBN& a, const ISBN& b)
     {
-        return a.get_n1() == b.get_n2() 
-            && a.get_n2() == b.get_n2()
-            && a.get_n3() == b.get_n3()
-            && a.get_n4() == b.get_n4();
+        return a.GetN1() == b.GetN1() 
+            && a.GetN2() == b.GetN2()
+            && a.GetN3() == b.GetN3()
+            && a.GetN4() == b.GetN4();
     }
     
     bool operator==(const Book& a, const Book& b)
     {
-        return a.get_isbn() == b.get_isbn();
+        return a.GetIsbn() == b.GetIsbn();
     }
 
     std::ostream& operator<<(std::ostream& os, ISBN i)
     {
-        return os << i.get_n1() << "-" << i.get_n2()
-            << "-" << i.get_n3() << "-" << i.get_n4();
+        return os << i.GetN1() << "-" << i.GetN2()
+            << "-" << i.GetN3() << "-" << i.GetN4();
     }
 }

@@ -5,7 +5,8 @@ namespace Chrono
 {
     enum class Month
     {
-        Jan=1, Feb, Mar, Apr, May, Jun, Jul, Aug, Sep, Oct, Nov, Dec
+        Jan=1, Feb, Mar, Apr, May, Jun,
+        Jul, Aug, Sep, Oct, Nov, Dec
     };
 
     enum class Day
@@ -23,26 +24,26 @@ namespace Chrono
         
         // non-modification functions
         void ShowDate() const;
-        Month get_month() const { return month; }
-        int get_year() const { return year; }
-        int get_day() const { return day; }
+        Month GetMonth() const { return month; }
+        int GetYear() const { return year; }
+        int GetDay() const { return day; }
 
         // modification functions
-        void add_day(int n);
-        void add_month(int n);
-        void add_year(int n);
+        void AddDay(int n);
+        void AddMonth(int n);
+        void AddYear(int n);
 
     private:
         int year;
         Month month;
         int day;
-        bool is_valid();
+        bool IsValid();
     };
 
     std::ostream& operator<<(std::ostream& os, Month m);
     std::ostream& operator<<(std::ostream& os, const Date& d);
 
-    bool is_leapyear(int n);
+    bool IsLeapYear(int n);
     bool operator==(const Date& a, const Date& b);
     bool operator!=(const Date& a, const Date& b);   
 }

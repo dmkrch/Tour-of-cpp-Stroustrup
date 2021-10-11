@@ -8,10 +8,11 @@ int main()
         std::string title;
         std::string author;
         Chrono::Date date{1974, Chrono::Month::Aug, 25};
+        Library::Genre genre{Library::Genre::adventure};
 
-        Library::Book b1{isbn_code, title, author, date, false};
 
-        std::cout << b1.get_isbn();
+        Library::Book b1{isbn_code, title, author, date, false, genre};
+        std::cout << b1.GetIsbn();
     }
     catch(...)
     {

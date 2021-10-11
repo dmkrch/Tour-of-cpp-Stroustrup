@@ -10,6 +10,21 @@ namespace Library
     };
 
 
+    class Patron
+    {
+    public:
+        Patron(std::string n, int c, bool p)
+            : userName{n}, userCardName{c}, isFeePaid{p} {}
+        
+        void SetMembershipFee(int n) const { membershipFee = n; }
+        bool IsPaidMembership() const { return isFeePaid; }
+    private:
+        std::string userName;
+        int userCardName;
+        static int membershipFee;
+        bool isFeePaid;
+    };
+
 
     // class for storing ISBN code in format n-n-n-x,
     // where n - number, x - digit or symbol
@@ -21,17 +36,17 @@ namespace Library
         ISBN(int a ,int b, int c, char d)
             : n1(a), n2(b), n3(c), x(d)
         {
-            if (!is_valid())
+            if (!IsValid())
                 throw new Invalid_ISBN();
         }
         
         ISBN() : n1(0), n2(0), n3(0), x('0') {}
 
         // non modification functions
-        int get_n1() const { return n1; }
-        int get_n2() const { return n2; }
-        int get_n3() const { return n3; }
-        char get_n4() const { return x; }
+        int GetN1() const { return n1; }
+        int GetN2() const { return n2; }
+        int GetN3() const { return n3; }
+        char GetN4() const { return x; }
 
 
     private:
@@ -39,7 +54,7 @@ namespace Library
         int n2;
         int n3;
         char x;
-        bool is_valid();
+        bool IsValid();
     };
 
 
@@ -48,18 +63,20 @@ namespace Library
     {
     public:
         class Invalid_Book {};
-        Book(ISBN c, std::string t, std::string n, Chrono::Date d, bool g);
+        Book(ISBN c, std::string t, std::string n,
+            Chrono::Date d, bool g, Genre gr);
 
 
         // non modification functions
-        ISBN get_isbn() const { return isbn_code; }
+        ISBN GetIsbn() const { return isbnCode; }
 
     private:
-        ISBN isbn_code;
+        ISBN isbnCode;
         std::string title;
-        std::string author_name;
-        Chrono::Date registration_date;
-        bool is_given;
+        std::string authorName;
+        Chrono::Date registrationDate;
+        bool IsGiven;
+        Genre genre;
     };
 
 
@@ -69,6 +86,6 @@ namespace Library
     std::ostream& operator<<(std::ostream& os, ISBN i);
 
     // some useful functions
-    bool is_digit(int a);
-    bool is_eng_symbol(int a);
+    bool IsDigit(int a);
+    bool IsEngSymbol(int a);
 }
