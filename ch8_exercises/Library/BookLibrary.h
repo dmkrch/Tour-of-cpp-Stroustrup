@@ -1,28 +1,13 @@
 #include <iostream>
+#include <vector>
 #include "Chrono.h"
 
-namespace Library
+namespace LibraryTools
 {
     enum class Genre
     {
         fantastics, prose, story,
         biography, novel, adventure,
-    };
-
-
-    class Patron
-    {
-    public:
-        Patron(std::string n, int c, bool p)
-            : userName{n}, userCardName{c}, isFeePaid{p} {}
-        
-        void SetMembershipFee(int n) const { membershipFee = n; }
-        bool IsPaidMembership() const { return isFeePaid; }
-    private:
-        std::string userName;
-        int userCardName;
-        static int membershipFee;
-        bool isFeePaid;
     };
 
 
@@ -79,7 +64,6 @@ namespace Library
         Genre genre;
     };
 
-
     // operators overload
     bool operator==(const ISBN& a, const ISBN& b);
     bool operator==(const Book& a, const Book& b);
@@ -88,4 +72,21 @@ namespace Library
     // some useful functions
     bool IsDigit(int a);
     bool IsEngSymbol(int a);
+
+
+    // class describes card of person that participates in library
+    class Patron
+    {
+    public:
+        Patron(std::string n, int c, bool p)
+            : userName{n}, userCardName{c}, isFeePaid{p} {}
+        
+        void SetMembershipFee(int n) const { membershipFee = n; }
+        bool IsPaidMembership() const { return isFeePaid; }
+    private:
+        std::string userName;
+        int userCardName;
+        static int membershipFee;
+        bool isFeePaid;
+    };
 }
