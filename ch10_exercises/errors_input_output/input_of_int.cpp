@@ -1,43 +1,60 @@
 #include <iostream>
 
 
-int main()
+void skip_to_int()
 {
-    std::cout << "Enter number from 1 to 10:\n";
-    int n = 0;
-
-    while(true)
+    if (std::cin.fail()) // something not an integer number...
     {
-        std::cin >> n;
-        if (std::cin) // entered integer number. checking it
-        {
-            if (1 <= n && n <= 10) 
-                break;
-            std::cout << "sorry, " << n << " is out of [1,10] interval\n";
-        }
-        else if (std::cin.fail()) // something not an integer number...
-        {
-            std::cin.clear();   // returning stream to state 'good'. We wannna take a look at symbols
+        std::cin.clear();   // returning stream to state 'good'. We wannna take a look at symbols
 
-            std::cout << "This is not a number. Try again\n";
-            for (char ch; std::cin >> ch && !isdigit(ch);)
-                ; // skipping not numbers
-            if (!std::cin)
-            {
-                std::cout << "No input anymore\n";
-                // state to end work: exception maybe
-            }
-            
-            std::cin.unget();   // returning digit, so that we can read number
-        }
-        else 
+        for (char ch; std::cin;) // skipping symbols
         {
-            std::cout << "No input anymore\n";
-            // state of eof or bad: ending work somehow: exception maybe
+            if (isdigit(ch) || ch == '-')
+            {
+                std::cin.unget(); // returning digit, so that we can read number
+                return;
+            }
         }
     }
+    std::cout << "exception error here\n";
+}
 
-    std::cout << "Your number: " << n << std::endl;
+int get_int()
+{
+    int n = 0;
+    while(true)
+    {
+        if (std::cin >> n)
+            return n;
+        
+        std::cout << "This is not a number, try again\n";
+        skip_to_int();
+    }
+}
+
+int get_int(int low, int high)
+{
+    std::cout << "Enter integer number from "
+        << low << " to " << high << " including:\n";
+        
+    while(true)
+    {
+        int n = get_int();
+        if (low <= n && n <= high)
+            return n;
+        
+        std::cout << "Sorry, " << n << " is out of interval [" 
+            << low << ", " << high << "]\n";
+    }
+}
+
+
+int main()
+{
+    int n = get_int(1,10);
+
+    int m = get_int(2, 300);
+    std::cout << "m: " << m << std::endl;
 
     return 0;
 }
