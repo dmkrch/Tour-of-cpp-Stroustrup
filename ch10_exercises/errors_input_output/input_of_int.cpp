@@ -32,18 +32,18 @@ int get_int()
     }
 }
 
-int get_int(int low, int high)
+int get_int(int low, int high, const std::string& greeting,
+            const std::string& sorry)
 {
-    std::cout << "Enter integer number from "
-        << low << " to " << high << " including:\n";
-        
+    std::cout << greeting << low << " to " << high << " including:\n";
+
     while(true)
     {
         int n = get_int();
         if (low <= n && n <= high)
             return n;
         
-        std::cout << "Sorry, " << n << " is out of interval [" 
+        std::cout << sorry << n << " is out of interval [" 
             << low << ", " << high << "]\n";
     }
 }
@@ -51,9 +51,11 @@ int get_int(int low, int high)
 
 int main()
 {
-    int n = get_int(1,10);
+    int n = get_int(1,10, "Enter power", "Out of interval, try again");
 
-    int m = get_int(2, 300);
+    int m = get_int(2, 300, "Enter height in feet",
+                    "Out of interval. Try typing again");
+                    
     std::cout << "m: " << m << std::endl;
 
     return 0;
