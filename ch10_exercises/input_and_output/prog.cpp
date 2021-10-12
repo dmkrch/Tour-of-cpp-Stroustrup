@@ -33,11 +33,6 @@ int main()
             std::cout << "Unable to open file for reading " << iname << std::endl;
         else
             std::cout << "File for reading has been opened" << std::endl;
-        
-        if (!ost)
-            std::cout << "Unable to open file for writing " << iname << std::endl;
-        else
-            std::cout << "File for writing has been opened" << std::endl;
 
 
         // reading temperatures from ist
