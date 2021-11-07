@@ -17,12 +17,23 @@ public:
     }
 };
 
+class D1 : public B1 {
+public:
+    void vf() override {
+        std::cout << "D1::vf() ";
+    }
+};
+
 int main() {
     try {
         B1 b1;
 
         b1.vf();
         b1.f();
+
+        D1 d1;
+        d1.vf();
+        d1.f();
     }
     catch(...) {
         std::cerr << "some error" << std::endl;
