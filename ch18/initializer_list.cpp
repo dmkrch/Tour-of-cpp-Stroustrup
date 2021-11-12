@@ -2,7 +2,7 @@
 
 
 class MyVector {
-private:    
+public:    
     int sz;
     double* elem;
 public:
@@ -12,17 +12,23 @@ public:
             elem[i] = 0.0;
     }
 
+
+    ~MyVector() {
+        delete [] elem;
+    }
+
     //constructor with initializer list
     MyVector(std::initializer_list<double> lst)
     : sz{static_cast<int>(lst.size())}, elem{new double[sz]} {
         std::copy(lst.begin(), lst.end(), elem);
     }
 
+    // copy constructor
     MyVector(const MyVector& arg) 
     : sz{arg.sz}, elem{new double[arg.sz]} {
         std::cout << "copy constructor has been called for vector\n";
-        for (int i = 0; i < sz; ++i) 
-            elem[i] = arg.elem[i];
+
+        std::copy(arg.elem, arg.elem+sz, elem);
     }
 
     // function that prints elements of vector
@@ -35,6 +41,11 @@ public:
 
 };
 
+void testFunc(MyVector v) {
+    std::cout << "address: " << v.elem;
+    std::cout << " in test func\n";
+}
+
 
 int main() {
     try {
@@ -42,17 +53,15 @@ int main() {
         v.PrintVector();
         // 2.3 2.6 5.6 8.3
 
-        std::cout << std::endl;
-        
-        MyVector v1(6);
-        v1.PrintVector();
-         // 0 0 0 0 0 0
+        MyVector v2{v}; // copy constructor    
 
-        v1 = v; // not copy constructor
-        MyVector v2{v1}; // copy constructor
-        
-        MyVector v3(3);
-        v3 = v1; // not copy constructor
+        std::cout << "address: " << v2.elem << " in main\n";
+        testFunc(v2);
+
+        // here we dont get an error because we have copy custom constructor.
+        // so that function doesnt just copy address of elem. It creates new, that
+        // is being deleted after function ends 
+        v2.PrintVector();
     }
     catch(...) {
         std::cout << "some general error" << std::endl;
