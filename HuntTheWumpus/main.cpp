@@ -15,13 +15,47 @@ enum class TurnChoice {
 
 class Room {
 private:
+    // members
     RoomType roomType;
     int roomNumber;
-    int neighborRooms[3];
+    std::vector<Room*> neighborRooms;
 
 public:
-    Room() : roomType(RoomType::EmptyRoom), roomNumber(0) {}
+    // functions
+    Room() : roomType(RoomType::EmptyRoom), roomNumber(roomUniqueNumber) {
+        ++roomUniqueNumber;
+    }
+
+    ~Room() {
+        --roomUniqueNumber;
+    }
+
     int GetRoomNumber() const { return roomNumber; }
+
+    // members
+    static int roomUniqueNumber;
+};
+
+int Room::roomUniqueNumber = 1;
+
+
+class Player {
+private:
+    bool isAlive;
+
+public:
+    Player() : isAlive(true) {};
+    void SetPlayerDeath() { isAlive=false; }
+    bool IsAlive() { return isAlive; }
+};
+
+
+class GameField {
+private:
+    Player player;
+    std::vector<Room> rooms;
+public:
+
 };
 
 
@@ -49,18 +83,23 @@ int main() {
     // first we need to set up rooms
     std::vector<Room> rooms{20};
 
+    Player player;
+
     std::cout << "Welcom to game 'Hunt The Hampus'!\n";
 
-    while (true) {
+    while (player.IsAlive()) {
         TurnChoice choice = GetPlayerTurnChoice();
 
         switch (choice) {
         case TurnChoice::Move:
             std::cout << "Your choice is move" << std::endl;
+            
+
             break;
 
         case TurnChoice::Shoot:
             std::cout << "Your choice is shoot" << std::endl;
+
             break;
         }
     }
