@@ -1,5 +1,9 @@
 #include <iostream>
 #include <vector>
+#include <cstdlib>
+#include <ctime>
+#include <list>
+#include <bits/stdc++.h>
 
 enum class RoomType {
     EmptyRoom,
@@ -19,7 +23,6 @@ private:
     RoomType roomType;
     int roomNumber;
     std::vector<Room*> neighborRooms;
-
 public:
     // functions
     Room() : roomType(RoomType::EmptyRoom), roomNumber(roomUniqueNumber) {
@@ -30,6 +33,7 @@ public:
         --roomUniqueNumber;
     }
 
+    void AddNeighbor(Room* room) { neighborRooms.push_back(room); }
     int GetRoomNumber() const { return roomNumber; }
 
     // members
@@ -55,7 +59,58 @@ private:
     Player player;
     std::vector<Room> rooms;
 public:
+    GameField() {
+        // here we need to set up rooms and other stuff.
 
+        // creating player instance
+        player = Player();
+
+        // creating 20 rooms with unique number 1..20
+        rooms = std::vector<Room>(20);
+
+
+        for (int i = 0; i < rooms.size(); ++i) {
+            // here we need to set neighbors for rooms[i]
+            // so actions below will be done 3 times. As each room must
+            // have 3 neighbors
+
+            // vector for storing neighbors amount that room
+            // already has. id of vector 'relationsCount' == id of room
+            // so, relationsCount[2] = 2 means that rooms[2] has 2 neighbors
+            // relationsCount[5] = 0 means that rooms[5] has no neighbors yet
+            std::vector<int> relationsCount(20, 0);
+
+            // list for storing id of vacant Rooms. List - because we will need to delete a lot
+            // vacant - means that room doesn't have all 3 neighbors(relationsCount< 3)
+            // it is used for generating random vacantRoomsId, so that every game will
+            // have new relations
+            std::list<int> vacantRoomsId;
+            
+            // pushing all rooms to vacantRooms cause they dont have neighbors yet
+            for (int i = 0; i < 20; ++i)
+                vacantRoomsId.push_back(i);
+
+            
+            // now we need to find 3 neighbors for rooms[i]
+            for (int j = 0; j < 3; ++j) {
+                // get random vector id (rand from [0,size-1])
+                int randomListId = 0;
+                randomListId = rand() % vacantRoomsId.size();
+
+                std::list<int>::iterator it = randomListId.begin();
+                std::advance(it, 5);
+                int neighborId = *it;
+
+                // main action - adding neighbor to Room[i]
+                rooms[i].AddNeighbor(&rooms[i]);
+                relationsCount[neighborId]++;
+
+                // checking whether we need to remove room from vacant rooms vector
+                if (relationsCount[neighborId]==3)
+                    vacantRoomsId.remove(neighborId);
+            }
+        }
+    }
 };
 
 
@@ -72,7 +127,7 @@ TurnChoice GetPlayerTurnChoice() {
         if (choice==1||choice==2)
             break;
 
-        std::cout << "Wrong number! Try again:\n";
+        std::cout << "There is no such choice! Try again...\n";
     }
 
     return static_cast<TurnChoice>(choice);
@@ -80,29 +135,31 @@ TurnChoice GetPlayerTurnChoice() {
 
 
 int main() {
-    // first we need to set up rooms
-    std::vector<Room> rooms{20};
+    srand((unsigned) time(0));
 
-    Player player;
+    // GameField g;
+    // // first we need to set up rooms
+    // std::vector<Room> rooms{20};
 
-    std::cout << "Welcom to game 'Hunt The Hampus'!\n";
+    // Player player;
 
-    while (player.IsAlive()) {
-        TurnChoice choice = GetPlayerTurnChoice();
+    // std::cout << "Welcom to game 'Hunt The Hampus'!\n";
 
-        switch (choice) {
-        case TurnChoice::Move:
-            std::cout << "Your choice is move" << std::endl;
+    // while (player.IsAlive()) {
+    //     TurnChoice choice = GetPlayerTurnChoice();
+
+    //     switch (choice) {
+    //     case TurnChoice::Move:
+    //         std::cout << "Your choice is move" << std::endl;
             
+    //         break;
 
-            break;
+    //     case TurnChoice::Shoot:
+    //         std::cout << "Your choice is shoot" << std::endl;
 
-        case TurnChoice::Shoot:
-            std::cout << "Your choice is shoot" << std::endl;
-
-            break;
-        }
-    }
+    //         break;
+    //     }
+    // }
 
     return 0;
 }
