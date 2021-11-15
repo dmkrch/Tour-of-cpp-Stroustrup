@@ -1,4 +1,4 @@
-#include <iostream>
+    #include <iostream>
 #include <vector>
 #include <cstdlib>
 #include <ctime>
@@ -32,6 +32,8 @@ public:
     ~Room() {
         --roomUniqueNumber;
     }
+
+    void SetRoomNumber(int n) { roomNumber = n; }
 
     void AddNeighbor(Room* room) { neighborRooms.push_back(room); }
     int GetRoomNumber() const { return roomNumber; }
@@ -68,47 +70,106 @@ public:
         // creating 20 rooms with unique number 1..20
         rooms = std::vector<Room>(20);
 
+        // here we set relations 
+        rooms[0].AddNeighbor(&rooms[1]);
+        rooms[0].AddNeighbor(&rooms[4]);
+        rooms[0].AddNeighbor(&rooms[19]);
 
-        for (int i = 0; i < rooms.size(); ++i) {
-            // here we need to set neighbors for rooms[i]
-            // so actions below will be done 3 times. As each room must
-            // have 3 neighbors
+        rooms[1].AddNeighbor(&rooms[0]);
+        rooms[1].AddNeighbor(&rooms[2]);
+        rooms[1].AddNeighbor(&rooms[17]);
 
-            // vector for storing neighbors amount that room
-            // already has. id of vector 'relationsCount' == id of room
-            // so, relationsCount[2] = 2 means that rooms[2] has 2 neighbors
-            // relationsCount[5] = 0 means that rooms[5] has no neighbors yet
-            std::vector<int> relationsCount(20, 0);
+        rooms[2].AddNeighbor(&rooms[1]);
+        rooms[2].AddNeighbor(&rooms[3]);
+        rooms[2].AddNeighbor(&rooms[15]);
 
-            // list for storing id of vacant Rooms. List - because we will need to delete a lot
-            // vacant - means that room doesn't have all 3 neighbors(relationsCount< 3)
-            // it is used for generating random vacantRoomsId, so that every game will
-            // have new relations
-            std::list<int> vacantRoomsId;
+        rooms[3].AddNeighbor(&rooms[2]);
+        rooms[3].AddNeighbor(&rooms[4]);
+        rooms[3].AddNeighbor(&rooms[13]);
+
+        rooms[4].AddNeighbor(&rooms[0]);
+        rooms[4].AddNeighbor(&rooms[3]);
+        rooms[4].AddNeighbor(&rooms[5]);
+
+        rooms[5].AddNeighbor(&rooms[4]);
+        rooms[5].AddNeighbor(&rooms[6]);
+        rooms[5].AddNeighbor(&rooms[12]);
+
+        rooms[6].AddNeighbor(&rooms[5]);
+        rooms[6].AddNeighbor(&rooms[7]);
+        rooms[6].AddNeighbor(&rooms[19]);
+
+        rooms[7].AddNeighbor(&rooms[6]);
+        rooms[7].AddNeighbor(&rooms[8]);
+        rooms[7].AddNeighbor(&rooms[11]);
+
+        rooms[8].AddNeighbor(&rooms[7]);
+        rooms[8].AddNeighbor(&rooms[9]);
+        rooms[8].AddNeighbor(&rooms[18]);
+
+        rooms[9].AddNeighbor(&rooms[8]);
+        rooms[9].AddNeighbor(&rooms[10]);
+        rooms[9].AddNeighbor(&rooms[16]);
+
+        rooms[10].AddNeighbor(&rooms[9]);
+        rooms[10].AddNeighbor(&rooms[11]);
+        rooms[10].AddNeighbor(&rooms[14]);
+
+        rooms[11].AddNeighbor(&rooms[7]);
+        rooms[11].AddNeighbor(&rooms[10]);
+        rooms[11].AddNeighbor(&rooms[12]);
+
+        rooms[12].AddNeighbor(&rooms[5]);
+        rooms[12].AddNeighbor(&rooms[11]);
+        rooms[12].AddNeighbor(&rooms[13]);
+
+        rooms[13].AddNeighbor(&rooms[3]);
+        rooms[13].AddNeighbor(&rooms[12]);
+        rooms[13].AddNeighbor(&rooms[14]);
+
+        rooms[14].AddNeighbor(&rooms[10]);
+        rooms[14].AddNeighbor(&rooms[13]);
+        rooms[14].AddNeighbor(&rooms[15]);
+
+        rooms[15].AddNeighbor(&rooms[2]);
+        rooms[15].AddNeighbor(&rooms[14]);
+        rooms[15].AddNeighbor(&rooms[16]);
+
+        rooms[16].AddNeighbor(&rooms[9]);
+        rooms[16].AddNeighbor(&rooms[15]);
+        rooms[16].AddNeighbor(&rooms[17]);
+
+        rooms[17].AddNeighbor(&rooms[1]);
+        rooms[17].AddNeighbor(&rooms[16]);
+        rooms[17].AddNeighbor(&rooms[18]);
+
+        rooms[18].AddNeighbor(&rooms[8]);
+        rooms[18].AddNeighbor(&rooms[17]);
+        rooms[18].AddNeighbor(&rooms[19]);
+
+        rooms[19].AddNeighbor(&rooms[0]);
+        rooms[19].AddNeighbor(&rooms[6]);
+        rooms[19].AddNeighbor(&rooms[18]);
+
+
+        // vector for storing room numbers
+        std::vector<int> roomNumbers;
+
+        for (int i = 1; i <= 20; ++i)
+            roomNumbers.push_back(i);
+
+
+        for (int i = 0; i < 20; ++i) {
+            // randoming ids
+            int randomId = rand() % roomNumbers.size(); // random number from [0, arr.size]
+            int randomRoomNumber = roomNumbers[randomId];
+
+            rooms[i].SetRoomNumber(randomRoomNumber);
+
+            // deleting this roomNumber from roomNumbers, because it is already used
+            roomNumbers.erase(roomNumbers.begin() + randomId);
             
-            // pushing all rooms to vacantRooms cause they dont have neighbors yet
-            for (int i = 0; i < 20; ++i)
-                vacantRoomsId.push_back(i);
-
-            
-            // now we need to find 3 neighbors for rooms[i]
-            for (int j = 0; j < 3; ++j) {
-                // get random vector id (rand from [0,size-1])
-                int randomListId = 0;
-                randomListId = rand() % vacantRoomsId.size();
-
-                std::list<int>::iterator it = randomListId.begin();
-                std::advance(it, 5);
-                int neighborId = *it;
-
-                // main action - adding neighbor to Room[i]
-                rooms[i].AddNeighbor(&rooms[i]);
-                relationsCount[neighborId]++;
-
-                // checking whether we need to remove room from vacant rooms vector
-                if (relationsCount[neighborId]==3)
-                    vacantRoomsId.remove(neighborId);
-            }
+            std::cout << "#" << i+1 << " " << randomRoomNumber << std::endl;
         }
     }
 };
@@ -137,7 +198,7 @@ TurnChoice GetPlayerTurnChoice() {
 int main() {
     srand((unsigned) time(0));
 
-    // GameField g;
+    GameField g;    
     // // first we need to set up rooms
     // std::vector<Room> rooms{20};
 
