@@ -9,7 +9,7 @@ enum class RoomType {
     EmptyRoom,
     BatRoom,
     HampusRoom,
-    HoleRoom
+    PitRoom
 };
 
 enum class TurnChoice {
@@ -25,25 +25,13 @@ private:
     std::vector<Room*> neighborRooms;
 public:
     // functions
-    Room() : roomType(RoomType::EmptyRoom), roomNumber(roomUniqueNumber) {
-        ++roomUniqueNumber;
-    }
-
-    ~Room() {
-        --roomUniqueNumber;
-    }
+    Room() : roomType(RoomType::EmptyRoom), roomNumber(0) { }
 
     void SetRoomNumber(int n) { roomNumber = n; }
-
+    void SetRoomType(RoomType t) { roomType = t; }
     void AddNeighbor(Room* room) { neighborRooms.push_back(room); }
     int GetRoomNumber() const { return roomNumber; }
-
-    // members
-    static int roomUniqueNumber;
 };
-
-int Room::roomUniqueNumber = 1;
-
 
 class Player {
 private:
@@ -56,12 +44,12 @@ public:
 };
 
 
-class GameField {
+class GamePlay {
 private:
     Player player;
     std::vector<Room> rooms;
 public:
-    GameField() {
+    GamePlay() {
         // here we need to set up rooms and other stuff.
 
         // creating player instance
@@ -168,9 +156,52 @@ public:
 
             // deleting this roomNumber from roomNumbers, because it is already used
             roomNumbers.erase(roomNumbers.begin() + randomId);
-            
-            std::cout << "#" << i+1 << " " << randomRoomNumber << std::endl;
         }
+
+        roomNumbers.clear();
+
+        // now when we set relations, we need to set hampus, 2 holes, 2 bats
+        // in random different rooms
+        std::vector<int> roomIds;
+        for (int i = 0; i < 20; ++i)
+            roomIds.push_back(i);
+
+        int randomRoomId = rand() % roomIds.size();
+        int roomId = roomIds[randomRoomId];
+
+        rooms[roomId].SetRoomType(RoomType::BatRoom);
+        std::cout << "Bat #1 in " << rooms[roomId].GetRoomNumber() << std::endl;
+        // deleting this roomId from roomIds, because it is already used
+        roomIds.erase(roomIds.begin() + randomRoomId);
+
+
+        randomRoomId = rand() % roomIds.size();
+        roomId = roomIds[randomRoomId];
+        rooms[roomId].SetRoomType(RoomType::BatRoom);
+        std::cout << "Bat #1 in " << rooms[roomId].GetRoomNumber() << std::endl;
+        // deleting this roomId from roomIds, because it is already used
+        roomIds.erase(roomIds.begin() + randomRoomId);
+
+        randomRoomId = rand() % roomIds.size();
+        roomId = roomIds[randomRoomId];
+        rooms[roomId].SetRoomType(RoomType::PitRoom);
+        std::cout << "Pit #1 in " << rooms[roomId].GetRoomNumber() << std::endl;
+        // deleting this roomId from roomIds, because it is already used
+        roomIds.erase(roomIds.begin() + randomRoomId);
+
+        randomRoomId = rand() % roomIds.size();
+        roomId = roomIds[randomRoomId];
+        rooms[roomId].SetRoomType(RoomType::PitRoom);
+        std::cout << "Pit #2 in " << rooms[roomId].GetRoomNumber() << std::endl;
+        // deleting this roomId from roomIds, because it is already used
+        roomIds.erase(roomIds.begin() + randomRoomId);
+
+        randomRoomId = rand() % roomIds.size();
+        roomId = roomIds[randomRoomId];
+        rooms[roomId].SetRoomType(RoomType::PitRoom);
+        std::cout << "Hampus in " << rooms[roomId].GetRoomNumber() << std::endl;
+        // deleting this roomId from roomIds, because it is already used
+        roomIds.erase(roomIds.begin() + randomRoomId);
     }
 };
 
@@ -198,13 +229,9 @@ TurnChoice GetPlayerTurnChoice() {
 int main() {
     srand((unsigned) time(0));
 
-    GameField g;    
-    // // first we need to set up rooms
-    // std::vector<Room> rooms{20};
+    GamePlay g;    
 
-    // Player player;
-
-    // std::cout << "Welcom to game 'Hunt The Hampus'!\n";
+    std::cout << "Welcom to game 'Hunt The Hampus'!\n";
 
     // while (player.IsAlive()) {
     //     TurnChoice choice = GetPlayerTurnChoice();
