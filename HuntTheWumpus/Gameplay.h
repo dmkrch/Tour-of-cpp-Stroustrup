@@ -34,6 +34,15 @@ namespace HampusGame {
         void AddNeighbor(Room* room) { neighborRooms.push_back(room); }
         int GetRoomNumber() const { return roomNumber; }
 
+        bool HasSuchNeighbor(int n) {
+            for (int i = 0; i < neighborRooms.size(); ++i) {
+                if (neighborRooms[i]->GetRoomNumber() == n) 
+                    return true;
+            }
+            
+            return false;
+        }
+
         std::string GetRoomTypeString();
 
         // returns "1 3 5" for example
@@ -72,11 +81,39 @@ namespace HampusGame {
         // default constructor that does some tricks before game
         GamePlay();
 
-        bool IsGameContinues() {
-            return player.IsAlive();
-        }
-        // 
+        // returns state of game
+        bool IsGameContinues() { return player.IsAlive(); }
+
         std::string RoomsInfoToString();
+
         TurnChoice GetPlayerTurnChoice();
+
+        bool MovePlayer(int tunnelTo) {
+            if (rooms[playerRoomId].HasSuchNeighbor(tunnelTo)) {
+                // if so, than we find this neighbor and set it to player's position
+                for (int i = 0; i < rooms.size(); ++i) {
+                    if (rooms[i].GetRoomNumber()==tunnelTo) {
+                        playerRoomId=i;
+                        break;
+                    }
+                }
+                return true;
+            }
+            else
+                return false;
+        }
+
+        std::string GetStartRoundInfo() {
+            // 1. objects interraction
+            // 2. where is player
+            // 3. attentions
+            // 4. all neighbors
+
+            std::stringstream ss;
+            ss << "YOU ARE IN ROOM " << rooms[playerRoomId].GetRoomNumber() << std::endl
+            << "TUNNELS LEAD TO " << rooms[playerRoomId].GetRoomNeighborsString() << std::endl;
+
+            return ss.str();
+        }
     };
 }

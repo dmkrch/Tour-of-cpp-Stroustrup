@@ -8,19 +8,24 @@ int main() {
 
     GamePlay gameplay;
 
-    std::cout << "Welcom to game 'Hunt The Hampus'!\n";
+    std::cout << "WELCOME TO GAME HUNT THE HAMPUS!" << std::endl;
 
     while (gameplay.IsGameContinues()) {
+        std::cout << gameplay.GetStartRoundInfo();
+        
         TurnChoice choice = gameplay.GetPlayerTurnChoice();
 
         switch (choice) {
         case TurnChoice::Move:
-            std::cout << "Your choice is move" << std::endl;
+            std::cout << "WHERE TO?   ";
+            int tunnelTo;
+            std::cin >> tunnelTo;
             
-            break;
+            if (!gameplay.MovePlayer(tunnelTo))
+                std::cout << "WRONG TUNNEL!" << std::endl;
 
+            break;
         case TurnChoice::Shoot:
-            std::cout << "Your choice is shoot" << std::endl;
 
             break;
         }

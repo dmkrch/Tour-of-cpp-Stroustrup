@@ -146,22 +146,22 @@ namespace HampusGame {
 
 
     TurnChoice GamePlay::GetPlayerTurnChoice() {
-        int choice = 0;
+        std::string choice;
 
-        while(std::cin) {
-            std::cout << "Move or Shoot?" << std::endl;
-            std::cout << "1. Move" << std::endl;
-            std::cout << "2. Shoot" << std::endl;
-
+        while(true) {
+            std::cout << "MOVE OR SHOOT(M-S)?   ";
             std::cin >> choice;
 
-            if (choice==1||choice==2)
+            if (choice=="s"||choice=="S"||choice=="m"||choice=="M")
                 break;
 
-            std::cout << "There is no such choice! Try again...\n";
+            std::cout << "BAD INPUT, TRY AGAIN" << std::endl;
         }
 
-        return static_cast<TurnChoice>(choice);
+        if (choice=="s" || choice=="S")
+            return TurnChoice::Shoot;
+        else
+            return TurnChoice::Move;
     }
 
 
