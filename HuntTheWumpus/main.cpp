@@ -7,24 +7,25 @@ int main() {
     srand((unsigned) time(0));
 
     GamePlay gameplay;   
+    gameplay.PrintRooms();
 
     std::cout << "Welcom to game 'Hunt The Hampus'!\n";
 
-    // while (player.IsAlive()) {
-    //     TurnChoice choice = GetPlayerTurnChoice();
+    while (gameplay.IsGameContinue()) {
+        TurnChoice choice = GetPlayerTurnChoice();
 
-    //     switch (choice) {
-    //     case TurnChoice::Move:
-    //         std::cout << "Your choice is move" << std::endl;
+        switch (choice) {
+        case TurnChoice::Move:
+            std::cout << "Your choice is move" << std::endl;
             
-    //         break;
+            break;
 
-    //     case TurnChoice::Shoot:
-    //         std::cout << "Your choice is shoot" << std::endl;
+        case TurnChoice::Shoot:
+            std::cout << "Your choice is shoot" << std::endl;
 
-    //         break;
-    //     }
-    // }
+            break;
+        }
+    }
 
     return 0;
 }

@@ -4,6 +4,7 @@
 #include <ctime>
 #include <list>
 #include <bits/stdc++.h>
+#include <string>
 
 namespace HampusGame {
     enum class RoomType {
@@ -32,16 +33,41 @@ namespace HampusGame {
         void SetRoomType(RoomType t) { roomType = t; }
         void AddNeighbor(Room* room) { neighborRooms.push_back(room); }
         int GetRoomNumber() const { return roomNumber; }
-        
+
+        std::string GetRoomTypeString() {
+            switch(roomType) {
+            case RoomType::BatRoom:
+                return std::string("Bat room");
+            case RoomType::EmptyRoom:
+                return std::string("Empty room");
+            case RoomType::PitRoom:
+                return std::string("Pit room");
+            case RoomType::HampusRoom:
+                return std::string("Hampus room");
+            default:
+                return "";
+            }
+        }
+
+        // returns "1 3 5" for example
+        std::string GetRoomNeighborsString () {
+            std::string neighbors = "";
+
+            for (int i = 0; i < neighborRooms.size(); ++i) {
+                int n = neighborRooms[i]->GetRoomNumber();
+                neighbors += std::to_string(n);
+                neighbors.push_back(' ');
+            }
+
+            return neighbors;
+        }
     };
 
-
-    // std::ostream& operator<<(std::ostream& os, Room r)
-    // {
-    //     return os << "room #" << r.GetRoomNumber() << std::endl <<
-    //     "neighbors: " << r.GetRoomNeighbors() << std::endl <<
-    //     "type: " << r.GetRoomType();
-    // }
+    // returns "Empty room #8 tunnels: 1 11 6\n" for example
+    std::ostream& operator<<(std::ostream& os, Room r)
+    {
+        return os << r.GetRoomTypeString() << " #" << r.GetRoomNumber() << " tunnels: " << r.GetRoomNeighborsString() << std::endl;
+    }
 
     class Player {
     private:
@@ -58,14 +84,16 @@ namespace HampusGame {
     private:
         Player player;
         std::vector<Room> rooms;
-        int player_room_id;
+        int playerRoomId;
 
+        // function adds neighbors (n1, n2, n3) to room-argument 'r'
         void AddRoomNeighbors(Room& r, int n1, int n2, int n3) {
             r.AddNeighbor(&rooms[n1]);
             r.AddNeighbor(&rooms[n2]);
             r.AddNeighbor(&rooms[n3]);
         }
 
+        // sets all obstacles to rooms: bats, pits, hampus, playet
         void SetAllObastaclesInRooms() {
             // here we need to generate 6 random numbers - they are id of rooms
             // 0,1 for bat room; 2,3 for pit room; 4 for hampus room; 5 for player room
@@ -99,7 +127,7 @@ namespace HampusGame {
             rooms[randomRoomIds[4]].SetRoomType(RoomType::HampusRoom);
 
             // saving player room id
-            player_room_id = randomRoomIds[5];
+            playerRoomId = randomRoomIds[5];
         }
 
     public:
@@ -109,8 +137,29 @@ namespace HampusGame {
             // creating player instance
             player = Player();
 
-            // creating 20 rooms with unique number 1..20
+            // creating 20 rooms
             rooms = std::vector<Room>(20);
+
+            // now we need to assign different numbers to rooms
+            std::vector<int> differentRoomNumbers;
+            std::vector<int> twentyNumbers;
+
+            // vector for storing 20 numbers - these will be ids of rooms
+            for (int i = 1; i <= 20; ++i) 
+                twentyNumbers.push_back(i);
+
+            int randId;
+            int randomNumber;
+            for (int i = 0; i < 20; ++i) {
+                randId = rand() % twentyNumbers.size();
+                randomNumber = twentyNumbers[randId];
+                differentRoomNumbers.push_back(randomNumber);
+                twentyNumbers.erase(twentyNumbers.begin() + randId);
+            }
+
+            // now we set room number 
+            for (int i = 0; i < 20; ++i)
+                rooms[i].SetRoomNumber(differentRoomNumbers[i]);
 
             // here we set relations (each room should be connected to 3 others)
             AddRoomNeighbors(rooms[0], 1, 4, 19);
@@ -137,6 +186,17 @@ namespace HampusGame {
             // now when we set relations, we need to set hampus, 2 pits, 2 bats
             // in random different rooms
             SetAllObastaclesInRooms();
+        }
+
+        bool IsGameContinue() {
+            return player.IsAlive();
+        }
+
+        void PrintRooms() {
+            for (int i = 0; i < rooms.size(); ++i)
+                std::cout << rooms[i];
+
+            std::cout << "Player is in #" << rooms[playerRoomId].GetRoomNumber() << std::endl;
         }
     };
 
