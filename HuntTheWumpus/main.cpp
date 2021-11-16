@@ -6,13 +6,12 @@ using namespace HampusGame;
 int main() {
     srand((unsigned) time(0));
 
-    GamePlay gameplay;   
-    gameplay.PrintRooms();
+    GamePlay gameplay;
 
     std::cout << "Welcom to game 'Hunt The Hampus'!\n";
 
-    while (gameplay.IsGameContinue()) {
-        TurnChoice choice = GetPlayerTurnChoice();
+    while (gameplay.IsGameContinues()) {
+        TurnChoice choice = gameplay.GetPlayerTurnChoice();
 
         switch (choice) {
         case TurnChoice::Move:
