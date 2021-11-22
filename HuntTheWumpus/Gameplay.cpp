@@ -208,11 +208,11 @@ namespace WumpusGame {
             std::vector<std::string> attentions = rooms[playerRoomId].GetAttentionMessages();
             
             for (int i = 0; i < static_cast<int>(attentions.size()); ++i)
-                ss << attentions[i];
+                ss << red << attentions[i] << def;
         }
         
-        ss << std::endl << "YOU ARE IN ROOM " << rooms[playerRoomId].GetRoomNumber() << std::endl;
-        ss << "TUNNELS LEAD TO " << rooms[playerRoomId].GetRoomNeighborsString() << std::endl << std::endl;
+        ss << std::endl << "YOU ARE IN ROOM " << green << rooms[playerRoomId].GetRoomNumber() << def << std::endl;
+        ss << "TUNNELS LEAD TO " << green << rooms[playerRoomId].GetRoomNeighborsString() << def << std::endl << std::endl;
 
         return ss.str();
     }
@@ -286,4 +286,52 @@ namespace WumpusGame {
 
         return ss.str();
     }
+
+    void GamePlay::ShootLogic(std::string path) {
+            std::stringstream ss;
+            ss << path;
+
+            int roomNumber;
+            std::vector<int> shootRoomNumbers;
+            while(!ss.eof()) {
+                ss >> roomNumber;
+                shootRoomNumbers.push_back(roomNumber);
+            }
+
+            int currentArrowRoomId = playerRoomId;
+
+            for (int i = 0; i < static_cast<int>(shootRoomNumbers.size()); ++i) {
+                if (rooms[currentArrowRoomId].HasSuchNeighbor(shootRoomNumbers[i])) {
+                    // moving currentArrowRoomId to next room
+                    currentArrowRoomId = GetRoomIdByItsNumber(shootRoomNumbers[i]);
+
+                    // heck if wumpus is there. If so, player killed
+                    // him and has won the game
+                    // if not - continue the cycle
+
+                    if (rooms[currentArrowRoomId].GetRoomType()==RoomType::WumpusRoom) {
+                        std::cout << std::endl << "YOU KILLED WUMPUS!" << std::endl;
+                        player.SetPlayerVictory();
+                        return;
+                    }
+                }
+                else {
+                    std::cout << std::endl << "WRONG TUNNEL PATH! YOU LOST" << std::endl;
+                    gameover=true;
+                    return;
+                }
+            }
+
+            // if cycle has left the scope - that means player missed the shot
+            std::cout << std::endl << "YOU MISSED YOUR SHOT!" << std::endl;
+            player.WasteArrow();
+
+            if (!player.HasArrows()) {
+                std::cout << std::endl << "YOU HAVE WASTED ALL YOUR ARROWS!" << std::endl;
+                gameover=true;
+                return;
+            }
+
+            std::cout << player.GetArrowsAmount() << " ARROWS LEFT!" << std::endl;
+        }
 }
