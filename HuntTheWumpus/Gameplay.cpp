@@ -1,6 +1,6 @@
 #include "Gameplay.h"
 
-namespace HampusGame {
+namespace WumpusGame {
 
     // ------------------------------class 'Room' definitions--------------------------
     std::string Room::GetRoomTypeString() {
@@ -11,7 +11,7 @@ namespace HampusGame {
             return std::string("Empty room");
         case RoomType::PitRoom:
             return std::string("Pit room");
-        case RoomType::HampusRoom:
+        case RoomType::WumpusRoom:
             return std::string("Hampus room");
         default:
             return "";
@@ -127,7 +127,7 @@ namespace HampusGame {
             rooms[randomRoomIds[i]].SetRoomType(RoomType::PitRoom);
         
         // placing hampus
-        rooms[randomRoomIds[4]].SetRoomType(RoomType::HampusRoom);
+        rooms[randomRoomIds[4]].SetRoomType(RoomType::WumpusRoom);
 
         // saving player room id
         playerRoomId = randomRoomIds[5];

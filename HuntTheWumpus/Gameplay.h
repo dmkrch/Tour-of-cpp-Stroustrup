@@ -6,11 +6,11 @@
 #include <bits/stdc++.h>
 #include <string>
 
-namespace HampusGame {
+namespace WumpusGame {
     enum class RoomType {
         EmptyRoom,
         BatRoom,
-        HampusRoom,
+        WumpusRoom,
         PitRoom
     };
 
@@ -33,6 +33,39 @@ namespace HampusGame {
         void SetRoomType(RoomType t) { roomType = t; }
         void AddNeighbor(Room* room) { neighborRooms.push_back(room); }
         int GetRoomNumber() const { return roomNumber; }
+        bool HasMonstersNearby() {
+            for (int i = 0; i < neighborRooms.size(); ++i) {
+                if (neighborRooms[i]->GetRoomType()==RoomType::BatRoom || 
+                    neighborRooms[i]->GetRoomType()==RoomType::PitRoom ||
+                    neighborRooms[i]->GetRoomType()==RoomType::WumpusRoom)
+                        return true;
+            }
+            return false;
+        }
+        
+        bool IsRoomWithMonsters() {
+            return !(roomType==RoomType::EmptyRoom);
+        }
+
+        std::vector<std::string> GetAttentionMessages() {
+            std::vector<std::string> attentions;
+
+            for (int i = 0; i < neighborRooms.size(); ++i) {
+                switch(neighborRooms[i]->GetRoomType()) {
+                case RoomType::BatRoom:
+                    attentions.push_back("YOU HEAR A RUSTLING...\n");
+                    break;
+                case RoomType::PitRoom:
+                    attentions.push_back("YOU FEEL A COLD WIND BLOWING FROM A NEARBY CAVERN...\n");
+                    break;
+                case RoomType::WumpusRoom:
+                    attentions.push_back("YOU SMELL SOMETHING TERRIBLE NEARBY...\n");
+                    break;
+                }
+            }
+
+            return attentions;
+        }
 
         bool HasSuchNeighbor(int n) {
             for (int i = 0; i < neighborRooms.size(); ++i) {
@@ -42,6 +75,8 @@ namespace HampusGame {
             
             return false;
         }
+
+        RoomType GetRoomType() { return roomType; }
 
         std::string GetRoomTypeString();
 
@@ -57,11 +92,13 @@ namespace HampusGame {
     class Player {
     private:
         bool isAlive;
+        bool hasWon;
 
     public:
         Player() : isAlive(true) {};
         void SetPlayerDeath() { isAlive=false; }
         bool IsAlive() { return isAlive; }
+        bool HasWon() { return hasWon; }
     };
 
 
@@ -88,27 +125,73 @@ namespace HampusGame {
 
         TurnChoice GetPlayerTurnChoice();
 
-        bool MovePlayer(int tunnelTo) {
+        void MovePlayer(int tunnelTo) {
+            for (int i = 0; i < rooms.size(); ++i) {
+                if (rooms[i].GetRoomNumber()==tunnelTo) {
+                    playerRoomId=i;
+                    break;
+                }
+            }
+        }
+
+        bool MovePlayerLogic(int tunnelTo) {
             if (rooms[playerRoomId].HasSuchNeighbor(tunnelTo)) {
-                // if so, than we find this neighbor and set it to player's position
-                for (int i = 0; i < rooms.size(); ++i) {
-                    if (rooms[i].GetRoomNumber()==tunnelTo) {
-                        playerRoomId=i;
+                // if so, than we find this neighbor
+                int neighborId = 0;
+                while(rooms[neighborId].GetRoomNumber() != tunnelTo)
+                    ++neighborId;
+                
+                // first checking if room has monsters
+                if (rooms[neighborId].IsRoomWithMonsters()) {
+                    switch(rooms[neighborId].GetRoomType()) {
+                    case RoomType::WumpusRoom:
+                        std::cout << "WUMPUS HAS EATEN YOU!\n";
+                        player.SetPlayerDeath();
+                        break;
+                    case RoomType::PitRoom:
+                        std::cout << "YYYIIIIEEEE . . . FELL IN PIT\n";
+                        player.SetPlayerDeath();
+                        break;
+                    case RoomType::BatRoom:
+                        std::cout << "ZAP—SUPER BAT SNATCH! ELSEWHEREVILLE FOR YOU!\n";
+                        MovePlayer(tunnelTo);
+                        // we should move player to random room, but without bats;
                         break;
                     }
                 }
+                else if (rooms[neighborId].HasMonstersNearby()) { // room without monsters, but monsters are nearby
+                    std::vector<std::string> attentions = rooms[neighborId].GetAttentionMessages();
+                    
+                    for (int i = 0; i < attentions.size(); ++i)
+                        std::cout << attentions[i];
+                    
+                    MovePlayer(tunnelTo);
+                }
+                else if (rooms[neighborId].GetRoomType()==RoomType::EmptyRoom)
+                    MovePlayer(tunnelTo);
+
                 return true;
             }
             else
                 return false;
         }
 
-        std::string GetStartRoundInfo() {
-            // 1. objects interraction
-            // 2. where is player
-            // 3. attentions
-            // 4. all neighbors
+        std::string GetStartGameInfo() {
+            std::stringstream ss;
 
+            ss << "WELCOME TO GAME HUNT THE WUMPUS!" << std::endl;
+
+            if (rooms[playerRoomId].HasMonstersNearby()) { // room without monsters, but monsters are nearby
+                std::vector<std::string> attentions = rooms[playerRoomId].GetAttentionMessages();
+                
+                for (int i = 0; i < attentions.size(); ++i)
+                    ss << attentions[i];
+            }
+
+            return ss.str();
+        }
+
+        std::string GetStartRoundInfo() {
             std::stringstream ss;
             ss << "YOU ARE IN ROOM " << rooms[playerRoomId].GetRoomNumber() << std::endl
             << "TUNNELS LEAD TO " << rooms[playerRoomId].GetRoomNeighborsString() << std::endl;
