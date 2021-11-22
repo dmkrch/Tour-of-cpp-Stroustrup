@@ -43,6 +43,10 @@ public:
     void vf() override {
         std::cout << "D1::vf() ";
     }
+
+    void f() {
+        std::cout << "D1::f() ";
+    }
 };
 
 int main() {
@@ -60,8 +64,13 @@ int main() {
         B1& bRef = d1;
         bRef.vf();
         bRef.f();
+        
+        return 0;
     }
     catch(...) {
         std::cerr << "some error" << std::endl;
+        int code_error = 1;
+        return code_error;
     }
+
 }
