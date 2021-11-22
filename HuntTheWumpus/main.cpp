@@ -7,8 +7,7 @@ int main() {
     srand((unsigned) time(0));
 
     GamePlay gameplay;
-
-
+    
     std::cout << gameplay.GetStartGameInfo();
 
     while (gameplay.IsGameContinues()) {

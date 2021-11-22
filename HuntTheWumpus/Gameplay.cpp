@@ -3,21 +3,6 @@
 namespace WumpusGame {
 
     // ------------------------------class 'Room' definitions--------------------------
-    std::string Room::GetRoomTypeString() {
-        switch(roomType) {
-        case RoomType::BatRoom:
-            return std::string("Bat room");
-        case RoomType::EmptyRoom:
-            return std::string("Empty room");
-        case RoomType::PitRoom:
-            return std::string("Pit room");
-        case RoomType::WumpusRoom:
-            return std::string("Hampus room");
-        default:
-            return "";
-        }
-    }
-
     std::string Room::GetRoomNeighborsString() {
         std::string neighbors = "";
 
@@ -28,6 +13,47 @@ namespace WumpusGame {
         }
 
         return neighbors;
+    }
+
+    bool Room::HasMonstersNearby() {
+        for (int i = 0; i < neighborRooms.size(); ++i) {
+            if (neighborRooms[i]->GetRoomType()==RoomType::BatRoom || 
+                neighborRooms[i]->GetRoomType()==RoomType::PitRoom ||
+                neighborRooms[i]->GetRoomType()==RoomType::WumpusRoom)
+                    return true;
+        }
+        return false;
+    }
+
+    std::vector<std::string> Room::GetAttentionMessages() {
+        std::vector<std::string> attentions;
+
+        attentions.push_back("\n");
+
+        for (int i = 0; i < neighborRooms.size(); ++i) {
+            switch(neighborRooms[i]->GetRoomType()) {
+            case RoomType::BatRoom:
+                attentions.push_back("YOU HEAR A RUSTLING...\n");
+                break;
+            case RoomType::PitRoom:
+                attentions.push_back("YOU FEEL A COLD WIND BLOWING FROM A NEARBY CAVERN...\n");
+                break;
+            case RoomType::WumpusRoom:
+                attentions.push_back("YOU SMELL SOMETHING TERRIBLE NEARBY...\n");
+                break;
+            }
+        }
+
+        return attentions;
+    }
+
+    bool Room::HasSuchNeighbor(int roomNumber) {
+        for (int i = 0; i < neighborRooms.size(); ++i) {
+            if (neighborRooms[i]->GetRoomNumber() == roomNumber) 
+                return true;
+        }
+        
+        return false;
     }
 
     // -------------------------------class 'GamePlay' definitions--------------------
@@ -96,6 +122,94 @@ namespace WumpusGame {
         r.AddNeighbor(&rooms[n3]);
     }
 
+    void GamePlay::MovePlayer(int roomNumberTo) {
+        for (int i = 0; i < rooms.size(); ++i) {
+            if (rooms[i].GetRoomNumber()==roomNumberTo) {
+                playerRoomId=i;
+                break;
+            }
+        }
+    }
+
+    bool GamePlay::MovePlayerLogic(int roomNumberTo) {
+        if (rooms[playerRoomId].HasSuchNeighbor(roomNumberTo)) {
+            // if so, than we find this neighbor
+            int neighborId = 0;
+            while(rooms[neighborId].GetRoomNumber() != roomNumberTo)
+                ++neighborId;
+            
+            // first checking if room has monsters
+            if (rooms[neighborId].IsRoomWithMonsters()) {
+                switch(rooms[neighborId].GetRoomType()) {
+                case RoomType::WumpusRoom:
+                    std::cout << std::endl << "WUMPUS HAS EATEN YOU!" << std::endl;
+                    player.SetPlayerDeath();
+                    break;
+                case RoomType::PitRoom:
+                    std::cout << std::endl << "YYYIIIIEEEE . . . FELL IN PIT" << std::endl;
+                    player.SetPlayerDeath();
+                    break;
+                case RoomType::BatRoom:
+                    std::cout << std::endl << "ZAP—SUPER BAT SNATCH! ELSEWHEREVILLE FOR YOU!" << std::endl;
+                    // we should move player to random room, but without bats;
+                    int randId = rand() % rooms.size();
+
+                    // skipping bat rooms
+                    while(rooms[randId].GetRoomType()==RoomType::BatRoom)
+                        randId = rand() % rooms.size();
+
+                    // first we move player to neighbor room of result room
+                    int neighborToResultRoomNumber = rooms[randId].GetFirstNeighborRoomNumber();
+                    MovePlayer(neighborToResultRoomNumber);
+
+                    std::cout << std::endl << "BAT HAS MOVED YOU INTO ROOM " << 
+                        rooms[randId].GetRoomNumber() << std::endl;
+
+                    // and then we move again player to result room
+                    MovePlayerLogic(rooms[randId].GetRoomNumber());
+                    break;
+                }
+            }
+            else if (rooms[neighborId].HasMonstersNearby()) { // room without monsters, but monsters are nearby
+                std::vector<std::string> attentions = rooms[neighborId].GetAttentionMessages();
+                
+                for (int i = 0; i < attentions.size(); ++i)
+                    std::cout << attentions[i];
+                
+                MovePlayer(roomNumberTo);
+            }
+            else if (rooms[neighborId].GetRoomType()==RoomType::EmptyRoom) // if this is empty room just move player
+                MovePlayer(roomNumberTo);
+
+            return true;
+        }
+        else
+            return false;
+    }
+
+
+    std::string GamePlay::GetStartGameInfo() {
+        std::stringstream ss;
+
+        ss << "WELCOME TO GAME HUNT THE WUMPUS!" << std::endl << std::endl;
+
+        if (rooms[playerRoomId].HasMonstersNearby()) { // room without monsters, but monsters are nearby
+            std::vector<std::string> attentions = rooms[playerRoomId].GetAttentionMessages();
+            
+            for (int i = 0; i < attentions.size(); ++i)
+                ss << attentions[i];
+        }
+
+        return ss.str();
+    }
+
+    std::string GamePlay::GetStartRoundInfo() {
+        std::stringstream ss;
+        ss << "YOU ARE IN ROOM " << rooms[playerRoomId].GetRoomNumber() << std::endl
+            << "TUNNELS LEAD TO " << rooms[playerRoomId].GetRoomNeighborsString() << std::endl << std::endl;
+
+        return ss.str();
+    }
 
     void GamePlay::SetAllObastaclesInRooms() {
         // here we need to generate 6 random numbers - they are id of rooms
@@ -133,18 +247,6 @@ namespace WumpusGame {
         playerRoomId = randomRoomIds[5];
     }
 
-    std::string GamePlay::RoomsInfoToString() {
-        std::stringstream resultString;
-
-        for (int i = 0; i < rooms.size(); ++i)
-            resultString << rooms[i];
-
-        resultString << "Player is in #" << rooms[playerRoomId].GetRoomNumber() << std::endl;
-
-        return resultString.str();
-    }
-
-
     TurnChoice GamePlay::GetPlayerTurnChoice() {
         std::string choice;
 
@@ -162,11 +264,5 @@ namespace WumpusGame {
             return TurnChoice::Shoot;
         else
             return TurnChoice::Move;
-    }
-
-
-    std::ostream& operator<<(std::ostream& os, Room r)
-    {
-        return os << r.GetRoomTypeString() << " #" << r.GetRoomNumber() << " tunnels: " << r.GetRoomNeighborsString() << std::endl;
     }
 }
