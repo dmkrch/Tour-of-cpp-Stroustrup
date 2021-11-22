@@ -195,7 +195,7 @@ namespace WumpusGame {
     std::string GamePlay::GetStartGameInfo() {
         std::stringstream ss;
 
-        ss << "\t\t\t\tWELCOME TO GAME HUNT THE WUMPUS!";
+        ss << blue << "\t\t\t\tWELCOME TO GAME HUNT THE WUMPUS!" << def;
 
         return ss.str();
     }
@@ -298,6 +298,11 @@ namespace WumpusGame {
                 shootRoomNumbers.push_back(roomNumber);
             }
 
+            if (shootRoomNumbers.size() > 5) {
+                std::cout << "TOO MANY TUNNELS! MAXIMUM IS FIVE" << std::endl;
+                return;
+            }
+
             int currentArrowRoomId = playerRoomId;
 
             for (int i = 0; i < static_cast<int>(shootRoomNumbers.size()); ++i) {
@@ -327,7 +332,7 @@ namespace WumpusGame {
             player.WasteArrow();
 
             if (!player.HasArrows()) {
-                std::cout << std::endl << "YOU HAVE WASTED ALL YOUR ARROWS!" << std::endl;
+                std::cout << std::endl << "YOU HAVE WASTED ALL YOUR ARROWS! YOU LOST" << std::endl;
                 gameover=true;
                 return;
             }

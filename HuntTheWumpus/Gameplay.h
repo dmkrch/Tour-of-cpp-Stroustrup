@@ -108,6 +108,7 @@ namespace WumpusGame {
         Color::Modifier red=Color::FG_RED;
         Color::Modifier def=Color::FG_DEFAULT;
         Color::Modifier green=Color::FG_GREEN;
+        Color::Modifier blue=Color::FG_BLUE;
 
         // function adds neighbors (n1, n2, n3) to room-argument 'r'
         void AddRoomNeighbors(Room& r, int n1, int n2, int n3);
