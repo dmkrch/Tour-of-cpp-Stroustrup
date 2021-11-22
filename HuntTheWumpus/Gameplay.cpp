@@ -136,10 +136,8 @@ namespace WumpusGame {
 
     bool GamePlay::MovePlayerLogic(int roomNumberTo) {
         if (rooms[playerRoomId].HasSuchNeighbor(roomNumberTo)) {
-            // if so, than we find this neighbor
-            int neighborId = 0;
-            while(rooms[neighborId].GetRoomNumber() != roomNumberTo)
-                ++neighborId;
+            // if so, than we find this neighbor id
+            int neighborId = GetRoomIdByItsNumber(roomNumberTo);
             
             // first checking if room has monsters
             if (rooms[neighborId].IsRoomWithMonsters()) {
@@ -175,15 +173,7 @@ namespace WumpusGame {
                     break;
                 }
             }
-            else if (rooms[neighborId].HasMonstersNearby()) { // room without monsters, but monsters are nearby
-                std::vector<std::string> attentions = rooms[neighborId].GetAttentionMessages();
-                
-                for (int i = 0; i < static_cast<int>(attentions.size()); ++i)
-                    std::cout << attentions[i];
-                
-                MovePlayer(roomNumberTo);
-            }
-            else if (rooms[neighborId].GetRoomType()==RoomType::EmptyRoom) // if this is empty room just move player
+            else
                 MovePlayer(roomNumberTo);
 
             return true;
@@ -192,11 +182,27 @@ namespace WumpusGame {
             return false;
     }
 
+    int GamePlay::GetRoomIdByItsNumber(int roomNumber) {
+        for (int i = 0; i < static_cast<int>(rooms.size()); ++i) {
+            if (rooms[i].GetRoomNumber()==roomNumber)
+                return i;
+        }
+
+        return -1;
+    }
+
 
     std::string GamePlay::GetStartGameInfo() {
         std::stringstream ss;
 
-        ss << "WELCOME TO GAME HUNT THE WUMPUS!" << std::endl << std::endl;
+        ss << "\t\t\t\tWELCOME TO GAME HUNT THE WUMPUS!";
+
+        return ss.str();
+    }
+
+    std::string GamePlay::GetStartRoundInfo() {
+        std::stringstream ss;
+        ss << "------------------------------------------------------------------";
 
         if (rooms[playerRoomId].HasMonstersNearby()) { // room without monsters, but monsters are nearby
             std::vector<std::string> attentions = rooms[playerRoomId].GetAttentionMessages();
@@ -204,14 +210,9 @@ namespace WumpusGame {
             for (int i = 0; i < static_cast<int>(attentions.size()); ++i)
                 ss << attentions[i];
         }
-
-        return ss.str();
-    }
-
-    std::string GamePlay::GetStartRoundInfo() {
-        std::stringstream ss;
-        ss << "YOU ARE IN ROOM " << rooms[playerRoomId].GetRoomNumber() << std::endl
-            << "TUNNELS LEAD TO " << rooms[playerRoomId].GetRoomNeighborsString() << std::endl << std::endl;
+        
+        ss << std::endl << "YOU ARE IN ROOM " << rooms[playerRoomId].GetRoomNumber() << std::endl;
+        ss << "TUNNELS LEAD TO " << rooms[playerRoomId].GetRoomNeighborsString() << std::endl << std::endl;
 
         return ss.str();
     }

@@ -27,7 +27,7 @@ namespace WumpusGame {
         int roomNumber;
         std::vector<Room*> neighborRooms;
     public:
-        Room() : roomType(RoomType::EmptyRoom), roomNumber(0) { }
+        Room() : roomType{RoomType::EmptyRoom}, roomNumber{0} { }
 
         void SetRoomNumber(int n) { roomNumber = n; }
         void SetRoomType(RoomType t) { roomType = t; }
@@ -53,12 +53,17 @@ namespace WumpusGame {
     private:
         bool isAlive;
         bool hasWon;
+        int arrowsAmount;
 
     public:
-        Player() : isAlive{true}, hasWon{false} {};
+        Player() : isAlive{true}, hasWon{false}, arrowsAmount{5} {};
+        int GetArrowsAmount() { return arrowsAmount; }
         void SetPlayerDeath() { isAlive=false; }
+        void SetPlayerVictory() { hasWon = true; }
         bool IsAlive() { return isAlive; }
         bool HasWon() { return hasWon; }
+        void WasteArrow() { --arrowsAmount; }
+        bool HasArrows() { return arrowsAmount; }
     };
 
 
@@ -79,6 +84,8 @@ namespace WumpusGame {
         void MovePlayer(int roomNumberTo);
 
         void SetGameOver() { gameover = true; }
+        
+        int GetRoomIdByItsNumber(int roomNumber);
 
     public:
         // default constructor that does some tricks before game
@@ -88,7 +95,7 @@ namespace WumpusGame {
         void QuitTheGame() { gameover = true; }
 
         // returns state of game: true if player is alive and not gameover
-        bool IsGameContinues() { return (player.IsAlive() && !gameover); }
+        bool IsGameContinues() { return (player.IsAlive() && !gameover && !player.HasWon()); }
 
         // gets player turn choice: either move or shoot from std::cin
         TurnChoice GetPlayerTurnChoice();
@@ -104,5 +111,53 @@ namespace WumpusGame {
         std::string GetStartRoundInfo();
 
         std::string GetEndGameInfo();
+
+        void ShootLogic(std::string path) {
+            std::stringstream ss;
+            ss << path;
+
+            int roomNumber;
+            std::vector<int> shootRoomNumbers;
+            while(!ss.eof()) {
+                ss >> roomNumber;
+                shootRoomNumbers.push_back(roomNumber);
+            }
+
+            int currentArrowRoomId = playerRoomId;
+
+            for (int i = 0; i < static_cast<int>(shootRoomNumbers.size()); ++i) {
+                if (rooms[currentArrowRoomId].HasSuchNeighbor(shootRoomNumbers[i])) {
+                    // moving currentArrowRoomId to next room
+                    currentArrowRoomId = GetRoomIdByItsNumber(shootRoomNumbers[i]);
+
+                    // heck if wumpus is there. If so, player killed
+                    // him and has won the game
+                    // if not - continue the cycle
+
+                    if (rooms[currentArrowRoomId].GetRoomType()==RoomType::WumpusRoom) {
+                        std::cout << std::endl << "YOU KILLED WUMPUS!" << std::endl;
+                        player.SetPlayerVictory();
+                        return;
+                    }
+                }
+                else {
+                    std::cout << std::endl << "WRONG TUNNEL PATH! YOU LOST" << std::endl;
+                    gameover=true;
+                    return;
+                }
+            }
+
+            // if cycle has left the scope - that means player missed the shot
+            std::cout << std::endl << "YOU MISSED YOUR SHOT!" << std::endl;
+            player.WasteArrow();
+
+            if (!player.HasArrows()) {
+                std::cout << std::endl << "YOU HAVE WASTED ALL YOUR ARROWS!" << std::endl;
+                gameover=true;
+                return;
+            }
+
+            std::cout << player.GetArrowsAmount() << " ARROWS LEFT!" << std::endl;
+        }
     };
 }
