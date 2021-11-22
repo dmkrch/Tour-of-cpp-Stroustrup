@@ -16,7 +16,8 @@ namespace WumpusGame {
 
     enum class TurnChoice {
         Move = 1,
-        Shoot
+        Shoot,
+        Quit
     };
 
     class Room {
@@ -54,7 +55,7 @@ namespace WumpusGame {
         bool hasWon;
 
     public:
-        Player() : isAlive(true) {};
+        Player() : isAlive{true}, hasWon{false} {};
         void SetPlayerDeath() { isAlive=false; }
         bool IsAlive() { return isAlive; }
         bool HasWon() { return hasWon; }
@@ -63,6 +64,7 @@ namespace WumpusGame {
 
     class GamePlay {
     private:
+        bool gameover;
         Player player;
         std::vector<Room> rooms;
         int playerRoomId;
@@ -76,12 +78,17 @@ namespace WumpusGame {
         // just sets playerRoomId to needed room
         void MovePlayer(int roomNumberTo);
 
+        void SetGameOver() { gameover = true; }
+
     public:
         // default constructor that does some tricks before game
         GamePlay();
 
-        // returns state of game
-        bool IsGameContinues() { return player.IsAlive(); }
+        // ends the game by setting gameover to true
+        void QuitTheGame() { gameover = true; }
+
+        // returns state of game: true if player is alive and not gameover
+        bool IsGameContinues() { return (player.IsAlive() && !gameover); }
 
         // gets player turn choice: either move or shoot from std::cin
         TurnChoice GetPlayerTurnChoice();
@@ -95,5 +102,7 @@ namespace WumpusGame {
 
         // returns player position info and tunnels to other rooms
         std::string GetStartRoundInfo();
+
+        std::string GetEndGameInfo();
     };
 }

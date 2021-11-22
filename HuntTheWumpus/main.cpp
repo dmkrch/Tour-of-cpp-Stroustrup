@@ -28,10 +28,14 @@ int main() {
             break;
         case TurnChoice::Shoot:
             break;
+
+        case TurnChoice::Quit:
+            gameplay.QuitTheGame();
+            break;
         }
     }
-    
-    std::cout << "YOU LOST\n";
 
+    std::cout << gameplay.GetEndGameInfo();
+    
     return 0;
 }

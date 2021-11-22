@@ -6,7 +6,7 @@ namespace WumpusGame {
     std::string Room::GetRoomNeighborsString() {
         std::string neighbors = "";
 
-        for (int i = 0; i < neighborRooms.size(); ++i) {
+        for (int i = 0; i < static_cast<int>(neighborRooms.size()); ++i) {
             int n = neighborRooms[i]->GetRoomNumber();
             neighbors += std::to_string(n);
             neighbors.push_back(' ');
@@ -16,7 +16,7 @@ namespace WumpusGame {
     }
 
     bool Room::HasMonstersNearby() {
-        for (int i = 0; i < neighborRooms.size(); ++i) {
+        for (int i = 0; i < static_cast<int>(neighborRooms.size()); ++i) {
             if (neighborRooms[i]->GetRoomType()==RoomType::BatRoom || 
                 neighborRooms[i]->GetRoomType()==RoomType::PitRoom ||
                 neighborRooms[i]->GetRoomType()==RoomType::WumpusRoom)
@@ -30,7 +30,7 @@ namespace WumpusGame {
 
         attentions.push_back("\n");
 
-        for (int i = 0; i < neighborRooms.size(); ++i) {
+        for (int i = 0; i < static_cast<int>(neighborRooms.size()); ++i) {
             switch(neighborRooms[i]->GetRoomType()) {
             case RoomType::BatRoom:
                 attentions.push_back("YOU HEAR A RUSTLING...\n");
@@ -41,6 +41,8 @@ namespace WumpusGame {
             case RoomType::WumpusRoom:
                 attentions.push_back("YOU SMELL SOMETHING TERRIBLE NEARBY...\n");
                 break;
+            case RoomType::EmptyRoom:
+                break;
             }
         }
 
@@ -48,7 +50,7 @@ namespace WumpusGame {
     }
 
     bool Room::HasSuchNeighbor(int roomNumber) {
-        for (int i = 0; i < neighborRooms.size(); ++i) {
+        for (int i = 0; i < static_cast<int>(neighborRooms.size()); ++i) {
             if (neighborRooms[i]->GetRoomNumber() == roomNumber) 
                 return true;
         }
@@ -60,6 +62,7 @@ namespace WumpusGame {
 
     GamePlay::GamePlay() {
         // here we need to set up rooms and other stuff.
+        gameover=false;
 
         // creating player instance
         player = Player();
@@ -123,7 +126,7 @@ namespace WumpusGame {
     }
 
     void GamePlay::MovePlayer(int roomNumberTo) {
-        for (int i = 0; i < rooms.size(); ++i) {
+        for (int i = 0; i < static_cast<int>(rooms.size()); ++i) {
             if (rooms[i].GetRoomNumber()==roomNumberTo) {
                 playerRoomId=i;
                 break;
@@ -141,6 +144,8 @@ namespace WumpusGame {
             // first checking if room has monsters
             if (rooms[neighborId].IsRoomWithMonsters()) {
                 switch(rooms[neighborId].GetRoomType()) {
+                case RoomType::EmptyRoom:
+                    break;
                 case RoomType::WumpusRoom:
                     std::cout << std::endl << "WUMPUS HAS EATEN YOU!" << std::endl;
                     player.SetPlayerDeath();
@@ -173,7 +178,7 @@ namespace WumpusGame {
             else if (rooms[neighborId].HasMonstersNearby()) { // room without monsters, but monsters are nearby
                 std::vector<std::string> attentions = rooms[neighborId].GetAttentionMessages();
                 
-                for (int i = 0; i < attentions.size(); ++i)
+                for (int i = 0; i < static_cast<int>(attentions.size()); ++i)
                     std::cout << attentions[i];
                 
                 MovePlayer(roomNumberTo);
@@ -196,7 +201,7 @@ namespace WumpusGame {
         if (rooms[playerRoomId].HasMonstersNearby()) { // room without monsters, but monsters are nearby
             std::vector<std::string> attentions = rooms[playerRoomId].GetAttentionMessages();
             
-            for (int i = 0; i < attentions.size(); ++i)
+            for (int i = 0; i < static_cast<int>(attentions.size()); ++i)
                 ss << attentions[i];
         }
 
@@ -251,10 +256,10 @@ namespace WumpusGame {
         std::string choice;
 
         while(true) {
-            std::cout << "MOVE OR SHOOT(M-S)?   ";
+            std::cout << "MOVE, SHOOT OR QUIT ?(M-S-Q)?   ";
             std::cin >> choice;
 
-            if (choice=="s"||choice=="S"||choice=="m"||choice=="M")
+            if (choice=="s"||choice=="S"||choice=="m"||choice=="M"||choice=="q"||choice=="Q")
                 break;
 
             std::cout << "BAD INPUT, TRY AGAIN" << std::endl;
@@ -262,7 +267,22 @@ namespace WumpusGame {
 
         if (choice=="s" || choice=="S")
             return TurnChoice::Shoot;
-        else
+        else if (choice=="m" || choice=="M")
             return TurnChoice::Move;
+        else
+            return TurnChoice::Quit;
+    }
+
+    std::string GamePlay::GetEndGameInfo() {
+        std::stringstream ss;
+
+        if (player.HasWon())
+            ss << std::endl << "YOU WON" << std::endl;
+        else if (!player.IsAlive())
+            ss << std::endl << "YOU LOST" << std::endl;
+        else if (gameover)
+            ss << "";
+
+        return ss.str();
     }
 }
