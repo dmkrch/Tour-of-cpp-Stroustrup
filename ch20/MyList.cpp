@@ -90,7 +90,7 @@ int main() {
         std::cout << *p << std::endl;
 
     // and we can use this: (begin(), end() ++, !=, ==, *  ops are required for iterators)
-    for (double x : list1) 
+    for (int x : list1) 
         std::cout << x << std::endl;
 
     return 0;
