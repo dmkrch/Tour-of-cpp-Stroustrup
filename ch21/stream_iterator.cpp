@@ -14,12 +14,15 @@ int main() {
     std::ofstream os{to}; // opening output stream
 
     std::istream_iterator<std::string> ii{is}; // creating input iterator
-    std::istream_iterator<std::string> eos; // input terminator
-    std::ostream_iterator<std::string> oo{os, "\n"}; // creating output iterator
+    std::istream_iterator<std::string> eos; // input terminator(means end of file)
+    std::ostream_iterator<std::string> oo{os, "\n"}; // creating output iterator, with \n string after each element
 
+
+    // read consequence [ii, eos) into container, where eos - end of files
     std::vector<std::string> b{ii, eos}; // vector is initialized by input stream
+
     std::sort(b.begin(), b.end()); // sorting buffer
-    std::copy(b.begin(), b.end(), oo);  // copying buffer to output stream
+    std::unique_copy(b.begin(), b.end(), oo);  // copying buffer to output stream
 
     return 0;
 }
